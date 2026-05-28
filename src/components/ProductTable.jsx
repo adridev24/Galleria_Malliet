@@ -1,9 +1,9 @@
-import { formatCurrency, isVisible } from '../utils/formatters';
+import { formatKm, formatPrice, getVehicleTitle, isVisible } from '../utils/formatters';
 import EmptyState from './EmptyState';
 
 export default function ProductTable({ products, onEdit, onToggleVisible, onDelete }) {
   if (!products.length) {
-    return <EmptyState title="Todavia no hay vehiculos" text="CargÃ¡ el primero desde el formulario." />;
+    return <EmptyState title="Todavia no hay vehiculos" text="Carga el primero desde el formulario." />;
   }
 
   return (
@@ -16,30 +16,30 @@ export default function ProductTable({ products, onEdit, onToggleVisible, onDele
         <table>
           <thead>
             <tr>
-              <th>Nombre</th>
-              <th>Categoria</th>
+              <th>Vehiculo</th>
+              <th>Año</th>
+              <th>Km</th>
               <th>Precio</th>
               <th>Visible</th>
-              <th>Orden</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
             {products.map((product) => (
               <tr key={product.id}>
-                <td>{product.nombre}</td>
-                <td>{product.categoria}</td>
-                <td>{formatCurrency(product.precio)}</td>
+                <td>{getVehicleTitle(product)}</td>
+                <td>{product.anio}</td>
+                <td>{formatKm(product.km)}</td>
+                <td>{formatPrice(product)}</td>
                 <td>{isVisible(product.visible) ? 'SI' : 'NO'}</td>
-                <td>{product.orden}</td>
                 <td className="row-actions">
-                  <button className="button button-ghost" onClick={() => onEdit(product)}>
+                  <button className="button button-ghost button-small" onClick={() => onEdit(product)}>
                     Editar
                   </button>
-                  <button className="button button-secondary" onClick={() => onToggleVisible(product)}>
+                  <button className="button button-secondary button-small" onClick={() => onToggleVisible(product)}>
                     {isVisible(product.visible) ? 'Ocultar' : 'Mostrar'}
                   </button>
-                  <button className="button button-danger" onClick={() => onDelete(product.id)}>
+                  <button className="button button-danger button-small" onClick={() => onDelete(product.id)}>
                     Eliminar
                   </button>
                 </td>

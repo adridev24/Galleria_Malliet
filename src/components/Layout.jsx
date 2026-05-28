@@ -1,7 +1,9 @@
+import { assetPath, appPath } from '../config/appConfig';
 import { safeUrl } from '../utils/formatters';
 
 export default function Layout({ siteConfig, children }) {
   const businessName = siteConfig.businessName || 'MALLIET Automotores';
+  const logoUrl = assetPath(siteConfig.logoUrl);
 
   return (
     <div
@@ -12,8 +14,8 @@ export default function Layout({ siteConfig, children }) {
       }}
     >
       <header className="site-header">
-        <a href="/" className="brand">
-          {siteConfig.logoUrl ? <img src={siteConfig.logoUrl} alt={businessName} /> : <span className="brand-mark">{businessName.slice(0, 1)}</span>}
+        <a href={appPath('/')} className="brand">
+          {logoUrl ? <img src={logoUrl} alt={businessName} /> : <span className="brand-mark">{businessName.slice(0, 1)}</span>}
           <strong>{businessName}</strong>
         </a>
         <nav>
@@ -22,13 +24,13 @@ export default function Layout({ siteConfig, children }) {
               Instagram
             </a>
           )}
-          <a href="/admin">Admin</a>
+          <a href={appPath('/admin')}>Admin</a>
         </nav>
       </header>
       <main>{children}</main>
       <footer className="site-footer">
         <span>{businessName}</span>
-        <span>Vehiculos seleccionados, consultas directas y gestion simple.</span>
+        <span>Desarrollado por <a className="footer-link" href="mailto:puntocolonadmin@gmail.com">PuntoColon</a></span>
       </footer>
     </div>
   );

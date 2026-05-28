@@ -6,7 +6,7 @@ export default function SearchBar({ value, onChange }) {
         type="search"
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        placeholder="Nombre o descripcion"
+        placeholder="Marca, modelo, año, km, combustible o transmisión"
       />
     </label>
   );

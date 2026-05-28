@@ -18,36 +18,56 @@ Aplicacion React + Vite para publicar una galeria personalizable de vehiculos y 
 2. Agrega una hoja llamada `Productos` con estos encabezados en la primera fila:
 
 ```text
-id, nombre, descripcion, categoria, precio, imagenUrl, whatsapp, instagram, visible, orden, fechaAlta, fechaModificacion
+id, nombre, marca, modelo, anio, km, descripcion, categoria, precio, moneda, combustible, transmision, motor, color, puertas, ubicacion, imagenUrl, whatsapp, instagram, visible, orden, fechaAlta, fechaModificacion
 ```
 
-3. Agrega otra hoja llamada `Configuracion` con estos encabezados:
+3. Agrega otra hoja llamada `Configuracion` con dos columnas:
 
 ```text
-businessName, logoUrl, primaryColor, secondaryColor, whatsapp, instagram, welcomeText, heroImageUrl
+key, value
 ```
 
-El Apps Script incluido tambien puede crear ambas hojas automaticamente.
+Ejemplo de filas para `Configuracion`:
+
+```text
+admin_user, admin
+admin_password_hash, HASH_SHA256_DE_LA_PASSWORD
+businessName, MALLIET Automotores
+logoUrl, /assets/logo.PNG
+primaryColor, #0b0b0d
+secondaryColor, #d7b46a
+whatsapp, 5493447111111
+instagram, https://instagram.com/malliet.automotores
+welcomeText, Seleccion de vehiculos usados y seminuevos.
+heroImageUrl, https://...
+```
+
+El Apps Script incluido puede crear y migrar ambas hojas automaticamente.
 
 ## Configurar Google Apps Script
 
 1. En la planilla, entra a `Extensiones > Apps Script`.
 2. Copia el contenido de `google-apps-script/Code.gs`.
 3. Guarda el proyecto.
-4. Publica con `Implementar > Nueva implementaciÃ³n`.
-5. Selecciona `AplicaciÃ³n web`.
-6. Usa `Ejecutar como: Yo`.
-7. Usa `QuiÃ©n tiene acceso: Cualquier persona`.
-8. Copia la URL terminada en `/exec`.
+4. Ejecuta `generarHashInicial` para ver en Logs el hash SHA-256 de la contraseña inicial.
+5. En la hoja `Configuracion`, pega ese hash en la key `admin_password_hash`.
+6. Publica con `Implementar > Nueva implementacion`.
+7. Selecciona `Aplicacion web`.
+8. Usa `Ejecutar como: Yo`.
+9. Usa `Quien tiene acceso: Cualquier persona`.
+10. Copia la URL terminada en `/exec`.
 
 La API expone:
 
 - `GET ?action=listProducts`
 - `GET ?action=getConfig`
+- `POST { action: "login", user, password }`
 - `POST { action: "createProduct", product }`
 - `POST { action: "updateProduct", product }`
 - `POST { action: "deleteProduct", id }`
 - `POST { action: "updateConfig", config }`
+
+`getConfig` no devuelve `admin_password_hash`.
 
 ## Configurar Cloudinary
 
@@ -64,13 +84,12 @@ Copia `.env.example` a `.env` y completa:
 VITE_API_URL=https://script.google.com/macros/s/AKfycb.../exec
 VITE_CLOUDINARY_CLOUD_NAME=tu_cloud_name
 VITE_CLOUDINARY_UPLOAD_PRESET=tu_unsigned_upload_preset
-VITE_ADMIN_PASSWORD=cambia-esta-clave
 VITE_BUSINESS_NAME=MALLIET Automotores
-VITE_DEFAULT_WHATSAPP=5491112345678
-VITE_DEFAULT_INSTAGRAM=https://instagram.com/miemprendimiento
+VITE_DEFAULT_WHATSAPP=5493447111111
+VITE_DEFAULT_INSTAGRAM=https://instagram.com/malliet.automotores
 ```
 
-`VITE_ADMIN_PASSWORD` es una proteccion simple del panel. No reemplaza autenticacion avanzada, pero sirve para esta version sin backend.
+La contraseña del admin no va en variables `VITE`; se valida en Google Apps Script contra el hash guardado en Google Sheets.
 
 ## Ejecucion local
 
@@ -102,15 +121,4 @@ Luego abre la URL que muestra Vite. El panel esta en `/admin`.
 
 La interfaz consume `src/services/productService.js`. Si en el futuro se reemplaza Google Sheets por una API real, la mayoria de los cambios deberian quedar concentrados en ese servicio.
 
-La configuracion visual vive en la hoja `Configuracion` y se aplica al layout publico:
-
-- nombre del negocio
-- logo
-- color principal
-- color secundario
-- WhatsApp por defecto
-- Instagram por defecto
-- texto de bienvenida
-- imagen principal
-
-La arquitectura queda lista para sumar deteccion automatica de colores desde el logo mas adelante, idealmente como una funcion nueva en `src/services` o `src/utils` sin tocar las pantallas.
+La configuracion visual vive en la hoja `Configuracion` como pares `key/value` y se aplica al layout publico.

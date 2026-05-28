@@ -4,16 +4,32 @@ import Admin from './pages/Admin';
 import AdminLogin from './pages/AdminLogin';
 import Home from './pages/Home';
 import ProductDetail from './pages/ProductDetail';
-import { defaultSiteConfig } from './config/appConfig';
+import { defaultSiteConfig, routePath } from './config/appConfig';
 import { getSiteConfig, listProducts } from './services/productService';
+
+const SITE_CONFIG_CACHE_KEY = 'site-config-cache';
+
+function getCachedSiteConfig() {
+  try {
+    const cached = localStorage.getItem(SITE_CONFIG_CACHE_KEY);
+    return cached ? { ...defaultSiteConfig, ...JSON.parse(cached) } : defaultSiteConfig;
+  } catch {
+    return defaultSiteConfig;
+  }
+}
 
 export default function App() {
   const [products, setProducts] = useState([]);
-  const [siteConfig, setSiteConfig] = useState(defaultSiteConfig);
+  const [siteConfig, setSiteConfig] = useState(getCachedSiteConfig);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [authenticated, setAuthenticated] = useState(sessionStorage.getItem('admin-authenticated') === 'true');
-  const path = window.location.pathname;
+  const [authenticated, setAuthenticated] = useState(sessionStorage.getItem('adminLogged') === 'true');
+  const path = routePath(window.location.pathname);
+
+  function saveSiteConfig(config) {
+    setSiteConfig(config);
+    localStorage.setItem(SITE_CONFIG_CACHE_KEY, JSON.stringify(config));
+  }
 
   async function loadData() {
     setLoading(true);
@@ -21,7 +37,7 @@ export default function App() {
     try {
       const [productsData, configData] = await Promise.all([listProducts(), getSiteConfig()]);
       setProducts(productsData);
-      setSiteConfig(configData);
+      saveSiteConfig(configData);
     } catch (requestError) {
       setError(requestError.message);
     } finally {
@@ -50,7 +66,7 @@ export default function App() {
   return (
     <Layout siteConfig={siteConfig}>
       {path.startsWith('/admin') ? (
-        <Admin products={products} setProducts={setProducts} siteConfig={siteConfig} setSiteConfig={setSiteConfig} reloadProducts={loadData} />
+        <Admin products={products} setProducts={setProducts} siteConfig={siteConfig} setSiteConfig={saveSiteConfig} reloadProducts={loadData} />
       ) : path.startsWith('/producto/') ? (
         <ProductDetail product={detailProduct} siteConfig={siteConfig} />
       ) : (

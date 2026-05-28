@@ -1,11 +1,32 @@
 const rawApiUrl = import.meta.env.VITE_API_URL || '';
 const isPlaceholder = (value) => !value || value.includes('AKfycb...') || value.startsWith('tu_');
 
+export const appBasePath = import.meta.env.BASE_URL || '/';
+
+export function appPath(path = '/') {
+  const normalizedBase = appBasePath.endsWith('/') ? appBasePath : `${appBasePath}/`;
+  const normalizedPath = String(path || '/').replace(/^\/+/, '');
+  return `${normalizedBase}${normalizedPath}`;
+}
+
+export function assetPath(path = '') {
+  if (!path) return '';
+  if (/^(https?:|data:|mailto:|tel:)/i.test(path)) return path;
+  return appPath(path);
+}
+
+export function routePath(pathname = window.location.pathname) {
+  const normalizedBase = appBasePath.endsWith('/') ? appBasePath.slice(0, -1) : appBasePath;
+  if (normalizedBase && normalizedBase !== '/' && pathname.startsWith(normalizedBase)) {
+    return pathname.slice(normalizedBase.length) || '/';
+  }
+  return pathname || '/';
+}
+
 export const appConfig = {
   apiUrl: isPlaceholder(rawApiUrl) ? '' : rawApiUrl,
   cloudinaryCloudName: isPlaceholder(import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || '') ? '' : import.meta.env.VITE_CLOUDINARY_CLOUD_NAME,
   cloudinaryUploadPreset: isPlaceholder(import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || '') ? '' : import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-  adminPassword: import.meta.env.VITE_ADMIN_PASSWORD || '',
   businessName: import.meta.env.VITE_BUSINESS_NAME || 'MALLIET Automotores',
   defaultWhatsapp: import.meta.env.VITE_DEFAULT_WHATSAPP || '03447436621',
   defaultInstagram: import.meta.env.VITE_DEFAULT_INSTAGRAM || '',
@@ -13,7 +34,7 @@ export const appConfig = {
 
 export const defaultSiteConfig = {
   businessName: appConfig.businessName,
-  logoUrl: '/assets/logo.PNG',
+  logoUrl: 'assets/logo.PNG',
   primaryColor: '#0b0b0d',
   secondaryColor: '#d7b46a',
   whatsapp: appConfig.defaultWhatsapp,

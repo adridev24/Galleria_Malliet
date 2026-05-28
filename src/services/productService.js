@@ -1,6 +1,18 @@
 import { appConfig, defaultSiteConfig } from '../config/appConfig';
 import { demoProducts } from '../data/demoProducts';
 
+function mergeSiteConfig(config = {}) {
+  return Object.entries(config).reduce(
+    (merged, [key, value]) => {
+      if (value !== undefined && value !== null && String(value).trim() !== '') {
+        merged[key] = value;
+      }
+      return merged;
+    },
+    { ...defaultSiteConfig },
+  );
+}
+
 async function request(action, payload = {}, method = 'POST') {
   if (!appConfig.apiUrl) {
     throw new Error('Falta configurar VITE_API_URL.');
@@ -44,10 +56,15 @@ export async function deleteProduct(id) {
   return request('deleteProduct', { id });
 }
 
+export async function loginAdmin(user, password) {
+  const data = await request('login', { user, password });
+  return data.success === true;
+}
+
 export async function getSiteConfig() {
   try {
     const data = await request('getConfig', {}, 'GET');
-    return { ...defaultSiteConfig, ...(data.config || {}) };
+    return mergeSiteConfig(data.config || {});
   } catch (error) {
     if (!appConfig.apiUrl) return defaultSiteConfig;
     throw error;
@@ -56,5 +73,5 @@ export async function getSiteConfig() {
 
 export async function updateSiteConfig(config) {
   const data = await request('updateConfig', { config });
-  return { ...defaultSiteConfig, ...(data.config || {}) };
+  return mergeSiteConfig(data.config || {});
 }

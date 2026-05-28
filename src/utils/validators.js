@@ -1,6 +1,8 @@
 export function validateProduct(product) {
   const errors = {};
-  if (!product.nombre?.trim()) errors.nombre = 'El nombre es obligatorio.';
+  if (!product.marca?.trim()) errors.marca = 'La marca es obligatoria.';
+  if (!product.modelo?.trim()) errors.modelo = 'El modelo es obligatorio.';
+  if (!product.anio?.trim()) errors.anio = 'El año es obligatorio.';
   if (!product.descripcion?.trim()) errors.descripcion = 'La descripcion es obligatoria.';
   if (!product.categoria?.trim()) errors.categoria = 'La categoria es obligatoria.';
   return errors;

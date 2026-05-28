@@ -1,36 +1,50 @@
 import { useState } from 'react';
-import { appConfig } from '../config/appConfig';
 import ErrorMessage from '../components/ErrorMessage';
+import Loader from '../components/Loader';
+import { loginAdmin } from '../services/productService';
 
 export default function AdminLogin({ onLogin }) {
+  const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
-    if (!appConfig.adminPassword) {
-      setError('Falta configurar VITE_ADMIN_PASSWORD.');
-      return;
+    setError('');
+    setLoading(true);
+
+    try {
+      const success = await loginAdmin(user, password);
+      if (success) {
+        sessionStorage.setItem('adminLogged', 'true');
+        onLogin();
+        return;
+      }
+      setError('Usuario o contraseña incorrectos');
+    } catch {
+      setError('No se pudo validar el acceso. Revisá la configuración de Google Apps Script.');
+    } finally {
+      setLoading(false);
     }
-    if (password === appConfig.adminPassword) {
-      sessionStorage.setItem('admin-authenticated', 'true');
-      onLogin();
-      return;
-    }
-    setError('ContraseÃ±a incorrecta.');
   }
 
   return (
     <section className="auth-page">
       <form className="panel auth-card" onSubmit={handleSubmit}>
-        <h1>Panel de administraciÃ³n</h1>
-        <p>IngresÃ¡ la contraseÃ±a configurada para editar vehiculos y apariencia.</p>
+        <h1>Panel de administración</h1>
+        <p>Ingresá tus credenciales para editar vehículos y apariencia.</p>
         <label className="field">
-          <span>ContraseÃ±a</span>
-          <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
+          <span>Usuario</span>
+          <input value={user} onChange={(event) => setUser(event.target.value)} autoComplete="username" />
+        </label>
+        <label className="field">
+          <span>Contraseña</span>
+          <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" />
         </label>
         <ErrorMessage message={error} />
-        <button className="button button-primary" type="submit">
+        {loading && <Loader text="Validando acceso..." />}
+        <button className="button button-primary" type="submit" disabled={loading}>
           Entrar
         </button>
       </form>

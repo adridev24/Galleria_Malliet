@@ -5,7 +5,7 @@ import ErrorMessage from '../components/ErrorMessage';
 import Loader from '../components/Loader';
 import ProductGrid from '../components/ProductGrid';
 import SearchBar from '../components/SearchBar';
-import { isVisible, sortByOrder } from '../utils/formatters';
+import { getVehicleSearchText, isVisible, sortByOrder } from '../utils/formatters';
 
 export default function Home({ products, siteConfig, loading, error }) {
   const [category, setCategory] = useState('');
@@ -21,7 +21,7 @@ export default function Home({ products, siteConfig, loading, error }) {
     const normalizedQuery = query.trim().toLowerCase();
     return visibleProducts.filter((product) => {
       const matchesCategory = !category || product.categoria === category;
-      const text = `${product.nombre} ${product.descripcion}`.toLowerCase();
+      const text = getVehicleSearchText(product);
       const matchesQuery = !normalizedQuery || text.includes(normalizedQuery);
       return matchesCategory && matchesQuery;
     });
