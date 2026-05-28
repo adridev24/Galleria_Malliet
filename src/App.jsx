@@ -24,7 +24,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [authenticated, setAuthenticated] = useState(sessionStorage.getItem('adminLogged') === 'true');
-  const path = routePath(window.location.pathname);
+  const [path, setPath] = useState(() => routePath(window.location.pathname));
 
   function saveSiteConfig(config) {
     setSiteConfig(config);
@@ -47,6 +47,15 @@ export default function App() {
 
   useEffect(() => {
     loadData();
+  }, []);
+
+  useEffect(() => {
+    function handleNavigation() {
+      setPath(routePath(window.location.pathname));
+    }
+
+    window.addEventListener('popstate', handleNavigation);
+    return () => window.removeEventListener('popstate', handleNavigation);
   }, []);
 
   const detailProduct = useMemo(() => {

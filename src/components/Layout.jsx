@@ -1,9 +1,14 @@
-import { assetPath, appPath } from '../config/appConfig';
+import { assetPath, appPath, navigateTo } from '../config/appConfig';
 import { safeUrl } from '../utils/formatters';
 
 export default function Layout({ siteConfig, children }) {
   const businessName = siteConfig.businessName || 'MALLIET Automotores';
   const logoUrl = assetPath(siteConfig.logoUrl);
+
+  function handleInternalNavigation(event, path) {
+    event.preventDefault();
+    navigateTo(path);
+  }
 
   return (
     <div
@@ -14,7 +19,7 @@ export default function Layout({ siteConfig, children }) {
       }}
     >
       <header className="site-header">
-        <a href={appPath('/')} className="brand">
+        <a href={appPath('/')} className="brand" onClick={(event) => handleInternalNavigation(event, '/')}>
           {logoUrl ? <img src={logoUrl} alt={businessName} /> : <span className="brand-mark">{businessName.slice(0, 1)}</span>}
           <strong>{businessName}</strong>
         </a>
@@ -24,7 +29,7 @@ export default function Layout({ siteConfig, children }) {
               Instagram
             </a>
           )}
-          <a href={appPath('/admin')}>Admin</a>
+          <a href={appPath('/admin')} onClick={(event) => handleInternalNavigation(event, '/admin')}>Admin</a>
         </nav>
       </header>
       <main>{children}</main>

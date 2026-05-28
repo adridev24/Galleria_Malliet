@@ -23,6 +23,11 @@ export function routePath(pathname = window.location.pathname) {
   return pathname || '/';
 }
 
+
+export function navigateTo(path = '/') {
+  window.history.pushState({}, '', appPath(path));
+  window.dispatchEvent(new PopStateEvent('popstate'));
+}
 export const appConfig = {
   apiUrl: isPlaceholder(rawApiUrl) ? '' : rawApiUrl,
   cloudinaryCloudName: isPlaceholder(import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || '') ? '' : import.meta.env.VITE_CLOUDINARY_CLOUD_NAME,

@@ -1,14 +1,20 @@
 import { formatKm, formatPrice, getVehicleTitle, placeholderImage } from '../utils/formatters';
-import { appPath } from '../config/appConfig';
+import { appPath, navigateTo } from '../config/appConfig';
 
 export default function ProductCard({ product }) {
   const title = getVehicleTitle(product);
-  const detailUrl = appPath(`/producto/${encodeURIComponent(product.id)}`);
+  const detailPath = `/producto/${encodeURIComponent(product.id)}`;
+  const detailUrl = appPath(detailPath);
   const specs = [product.anio, formatKm(product.km), product.combustible, product.transmision].filter(Boolean);
+
+  function handleDetailNavigation(event) {
+    event.preventDefault();
+    navigateTo(detailPath);
+  }
 
   return (
     <article className="product-card">
-      <a href={detailUrl} className="product-media">
+      <a href={detailUrl} className="product-media" onClick={handleDetailNavigation}>
         <img
           src={product.imagenUrl || placeholderImage}
           alt={title}
@@ -31,7 +37,7 @@ export default function ProductCard({ product }) {
         <p>{product.descripcion}</p>
         <div className="product-card-footer">
           <strong>{formatPrice(product)}</strong>
-          <a className="button button-secondary" href={detailUrl}>
+          <a className="button button-secondary" href={detailUrl} onClick={handleDetailNavigation}>
             Ver detalle
           </a>
         </div>
